@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Sweeper",
+  "short_name": "Tab Sweeper",
+  "description": "When clicked, closes duplicate tabs",
+  "version": "1.30",
+  "options_ui": {
+    "page": "settings.html",
+    "open_in_tab": false
+  },
+  "action": {
+    "default_title": "Close Duplicate Tabs",
+    "default_icon": {
+      "19": "images/icon19.png",
+      "38": "images/icon38.png" 
+    }
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "background": {
+    "service_worker": "js/tabsweeper.js",
+    "type": "module"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "contextMenus",
+    "storage"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources" : [
+        "images/icon16.png"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
+  ]
+}

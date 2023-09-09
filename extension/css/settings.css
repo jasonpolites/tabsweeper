@@ -1,0 +1,175 @@
+.main {
+    width:670px;
+    height:430px; 
+    overflow-y: scroll;
+    margin:10px
+}
+
+h1 {
+    display: block;
+    font-family: 'Open Sans', Arial;
+    font-size: 18px;
+    color: #396EC1;
+}
+
+h2 {
+    display: inline-block;
+    font-family: 'Open Sans', Arial;
+    font-size: 14px;
+    font-style: italic;
+    color: #396EC1;
+    line-height: 10px;
+    margin: 0px;
+}
+
+th {
+    font-family: 'Open Sans', Arial;
+    font-size: 12px;
+    color: #396EC1;
+    text-align: left;
+}
+
+body {
+    margin:0px;
+    padding:0px;
+}
+
+.small {
+    font-family: 'Open Sans', Arial;
+    font-size: 9px;
+    text-decoration: none;
+    color: #888888;
+}
+
+.ex-icon {
+    cursor: pointer;
+}
+
+.ex-text {
+    width:300px;
+    padding:4px;
+    font-family: 'Open Sans', Arial;
+    font-size: 10px;
+    margin: 4px;
+}    
+
+.ex-text-add {
+    width:342px;
+}   
+
+.ex-sel {
+    width:150px;
+    height:24px;
+    padding:2px;
+    font-family: 'Open Sans', Arial;
+    font-size: 12px;
+    margin: 4px;
+}   
+
+.tab-icon {
+    vertical-align: middle;
+    width:16px;
+    height:16px;
+}
+
+.tab-text {
+    margin-left: 5px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.tab-close {
+    /*width: 16px*/
+    /*height:16px;*/
+    vertical-align: middle;
+    cursor: pointer;
+    margin:10px;
+}
+
+.tab-item {
+    width:450px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn {
+  -webkit-border-radius: 4;
+  -moz-border-radius: 4;
+  border-radius: 4px;
+  font-family: Open Sans, Arial;
+  color: #ffffff;
+  font-size: 12px;
+  background: #3498db;
+  padding: 4px;
+  border: solid #1f628d 1px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.blue {
+  background: #3498db;
+  border: solid #1f628d 1px;
+}
+
+.grey {
+  background: #999999;
+  border: solid #888888 1px;
+}
+
+.bottom {
+    position: absolute;
+    bottom: 5;
+    right: 10;
+}
+
+.blue:hover {
+  background: #3cb0fd;
+  text-decoration: none;
+}
+
+.grey:hover {
+  background: #555555;
+  text-decoration: none;
+}
+
+.note {
+    font-family: 'Open Sans', Arial;
+    font-size: 10px;
+    background-color: rgb(245, 245, 245);
+    color:black;
+    padding:5px;
+    margin:10px;
+    padding-left:-5px
+}
+
+
+.container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.container-bottom {
+    justify-content: flex-end;
+    height:30px;
+}
+
+.table {
+    display: table;
+}
+
+.table > * {
+    display: table-row;
+}
+  
+.table .col {
+    display: table-cell;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+

@@ -115,13 +115,7 @@ const insertRuleEntry = (rules, rule) => {
 const addRule = (rules) => {
   const elemRules = document.getElementById(`rule-list`);
   const elemRow = elemRules.firstChild;
-  const detectSelect = elemRow.childNodes.item(2).firstChild;
-
-  const rule = {
-    strUrlPattern: elemRow.childNodes.item(0).firstChild.value,
-    bUseFullUrl: elemRow.childNodes.item(1).firstChild.checked,
-    detectType: parseInt(detectSelect.options[detectSelect.selectedIndex].value)
-  };
+  const rule = makeRuleFromFormRow(elemRow);
 
   if(rule.strUrlPattern.trim().length > 0) {
     rules[rule.strUrlPattern] = rule;
@@ -139,7 +133,6 @@ const renderRules = (rules) => {
   clearRules();
   // Insert default entry row
   insertRuleEntry(rules);
-
   if(rules) {
     for (const key in rules) {
       const rule = rules[key];
@@ -168,23 +161,40 @@ const loadRules = async () => {
   document.getElementById('helpToggle').addEventListener('click', toggleHelp);
   document.getElementById('btn-close').addEventListener('click', doClose);
   document.getElementById('btn-save').addEventListener('click', async () => {
-    await saveAndClose(rules);
+    await saveAndClose();
   });
 
   renderRules(rules);
 }
 
-const saveAndClose = async (rules) => {
-  if(addRule(rules) === true) {
-    renderRules(rules);
+const getRulesFromFormData = () => {
+  let rules = {};
+  const elemRules = document.getElementById(`rule-list`);
+  const children = elemRules.childNodes;
+  for (const elemRow of children) {
+    const rule = makeRuleFromFormRow(elemRow);
+    if(rule.strUrlPattern.trim().length > 0) {
+      rules[rule.strUrlPattern] = rule;
+    }      
   }
+  return rules;
+}
 
+const makeRuleFromFormRow = (elemRow) => {
+  const detectSelect = elemRow.childNodes.item(2).firstChild;
+  return {
+    strUrlPattern: elemRow.childNodes.item(0).firstChild.value,
+    bUseFullUrl: elemRow.childNodes.item(1).firstChild.checked,
+    detectType: parseInt(detectSelect.options[detectSelect.selectedIndex].value)
+  };  
+}
+
+const saveAndClose = async (rules) => {
+  rules = getRulesFromFormData();
   await chrome.storage.sync.set({'rules': rules});
-
   await chrome.runtime.sendMessage(null, {
     action: 'update_exclusions'
   });
-  
   doClose();
 }
 

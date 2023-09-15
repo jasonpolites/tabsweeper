@@ -163,9 +163,8 @@ const updateVersion = () => {
 const loadRules = async () => {
 
   let result = await chrome.storage.sync.get('rules');
-
-  // chrome.storage.sync.get('rules', (result) => {
   let rules = result.rules || {};
+  
   document.getElementById('helpToggle').addEventListener('click', toggleHelp);
   document.getElementById('btn-close').addEventListener('click', doClose);
   document.getElementById('btn-save').addEventListener('click', async () => {
@@ -173,7 +172,6 @@ const loadRules = async () => {
   });
 
   renderRules(rules);
-  // });
 }
 
 const saveAndClose = async (rules) => {
@@ -182,18 +180,12 @@ const saveAndClose = async (rules) => {
   }
 
   await chrome.storage.sync.set({'rules': rules});
+
   await chrome.runtime.sendMessage(null, {
     action: 'update_exclusions'
   });
+  
   doClose();
-
-  // chrome.storage.sync.set({'rules': rules}, () => {
-    // chrome.runtime.sendMessage(null, {
-    //     action: 'update_exclusions'
-    // }, null, () => {
-    //     doClose();
-    // });
-  // });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

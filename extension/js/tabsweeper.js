@@ -16,35 +16,6 @@ const TYPE_TITLE = 1;
 const TYPE_DEFAULT = 2;
 
 
-
-/**
- * Closes any duplicate tabs
- * @param {Function} callback The function to call once all tabs were closed
- * @deprecated Prefer closeDuplicateTabsSync
- */
-const closeDuplicateTabs = (callback) => {
-  getDuplicateTabs(dupes => {
-    let num = dupes?.length;
-    pendingCloseEvents = num;
-    if (num > 0) {
-      for (let i = 0; i < dupes.length; i++) {
-        chrome.tabs.remove(dupes[i].id, () => {
-          if (--num === 0) {
-            setBadgeValue(0);
-            if (callback) {
-              callback.call(this, dupes);
-            }
-          }
-        });
-      }
-    } else {
-      if (callback) {
-        callback.call(this, dupes);
-      }
-    }
-  });
-}
-
 /**
  * Closes any duplicate tabs
  * @returns The duplicate tabs that were closed
@@ -66,55 +37,8 @@ const closeDuplicateTabsSync = async () => {
 
 /**
  * Finds any duplicate tabs
- * @param {Function} callback The function to call with the duplicate tabs
- * @deprecated Prefer getDuplicateTabsSync
+ * @returns An array of duplicate tab IDs, or an empty array (never null)
  */
-const getDuplicateTabs = (callback) => {
-  let self = this;
-  chrome.tabs.query({}, tabs => {
-    let dupes = [];
-
-    if (tabs) {
-      let all = [];
-
-      for (let i = 0; i < tabs.length; i++) {
-
-        // Get for exclusions
-        let type = TYPE_DEFAULT;
-        let bFullUrl = false;
-        for (let rule in rules) {
-          if (tabs[i].url.match(rule) != null) {
-            type = parseInt(rules[rule].detectType);
-            bFullUrl = rules[rule].bUseFullUrl === true;
-            break;
-          }
-        }
-
-        if (type >= 0) {
-          let id = getTabIdentifier(tabs[i], type, bFullUrl);
-          if (!all[id]) {
-            all[id] = tabs[i];
-          } else {
-            // Don't push this one if it's the current tab
-            if(tabs[i].highlighted == true) {
-            // if (tabs[i].id === currentTabId) {
-              dupes.push(all[id]);
-            } else {
-              dupes.push(tabs[i]);
-            }
-          }
-        }
-      }
-
-      all = null; // Delete
-    }
-
-    if (callback) {
-      callback.call(self, dupes);
-    }
-  });
-}
-
 const getDuplicateTabsSync = async () => {
   let tabs = await chrome.tabs.query({});
   let dupes = [];
@@ -138,7 +62,6 @@ const getDuplicateTabsSync = async () => {
         } else {
           // Don't push this one if it's the current tab
           if(tabs[i].highlighted == true) {
-          // if (tabs[i].id === currentTabId) {
             dupes.push(all[id]);
           } else {
             dupes.push(tabs[i]);
@@ -155,7 +78,6 @@ const getDuplicateTabsSync = async () => {
 const setBadgeValue = async (val) => {
   if (val == undefined) {
     let dupes = await getDuplicateTabsSync();
-    // getDuplicateTabs((dupes) => {
     setBadgeText(dupes.length);
     let title;
     if (dupes.length > 0) {
@@ -169,7 +91,6 @@ const setBadgeValue = async (val) => {
     chrome.action.setTitle({
       "title": title
     });
-    // });
   } else {
     setBadgeText(val);
   }
@@ -214,26 +135,6 @@ const getTabIdentifier = (tab, type, bFullUrl) => {
   } else {
     return url + "#" + tab.title;
   }
-}
-
-/**
- * Loads the options set by the user
- * @param {Function} callback The function to callback with the loaded options.
- * @deprecated Prefer loadOptionsSync
- */
-const loadOptions = (callback) => {
-  let self = this;
-  chrome.storage.sync.get('rules', (result) => {
-    if (result) {
-      rules = result.rules;
-      // showWarning = result.showWarning;
-    } else {
-      rules = {};
-    }
-    if (callback) {
-      callback.call(self, rules);
-    }
-  });
 }
 
 /**
@@ -284,17 +185,11 @@ const main = async () => {
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.action) {
       if (message.action === 'update_exclusions') {
-
         (async () => {
           await loadOptionsSync();
           await setBadgeValue();
           sendResponse();
         })();
-
-        // loadOptions(() => {
-        //   setBadgeValue();
-        //   sendResponse();
-        // });
       }
     }
     return true;
@@ -302,10 +197,6 @@ const main = async () => {
 
   await loadOptionsSync();
   await setBadgeValue();
-
-  // loadOptions(() => {
-  //   setBadgeValue();
-  // });
 }
 
 (async () => {

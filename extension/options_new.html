@@ -1,0 +1,74 @@
+<html>
+<head>
+    <title>TabSweeper&trade; Options</title>
+    <link rel='stylesheet' type='text/css' href='css/options_new.css'>
+    <script src="js/options_new.js"></script>
+</head>
+<body>
+    <div class="container">
+
+        <div class="content-container">
+            <!-- <h1>Options</h1>
+            <label for="chkDisplayWarning" title="Displays a popup with the list of tabs to be closed"><input id="chkDisplayWarning" type="checkbox"/> Show warning before closing tabs</label> -->
+                
+            <h1>Options</h1>
+            Specify a URL pattern to match specific websites, then choose what happens when <span id="brand">Tab Sweeper</span> is clicked <a href="#" class="help-icon" id="helpToggle" title="Click to show or hide inline help">?</a>
+            <div id="helptext" style="display:none;">
+                <ul style="margin-left:-4px">
+                    <li>
+                        <strong>URL Pattern</strong><br/>
+                        A string (text) pattern to identify a tab and assign a desired behavior
+                        <br/><br/>
+                        Examples:
+                        <br/>
+                        <table>
+                            <tr>
+                                <td class="example">https://www.reddit.com</td>
+                                <td>Match any url containing <b>https://www.reddit.com</b></td>
+                            </tr>
+                            <tr>
+                                <td class="example">google.com</td>
+                                <td>Match any url containing <b>google.com</b><br/>(e.g. will include www.google.com and drive.google.com)</td>
+                            </tr>   
+                            <tr>
+                                <td class="example">/^https:\/\/drive\.google\.com.*/</td>
+                                <td>Use / at the start and end to denote a "regular expression". This example will match URLs starting with <b>https://drive.google.com</b>, but will <u>not</u> match URLs starting with <b>https://www.google.com</b></td>
+                            </tr>                                       
+                        </table>
+        
+                        <div>
+                            <div class="example-item"></div>
+                            <div></div>
+                        </div>
+                    </li>
+                    <li>
+                        <strong>Use Full URL</strong><br/>
+                        If checked, the full URL (including query params) will be considered when matching. <br/>Default is false (unchecked)
+                    </li>
+                    <li>
+                        <strong>Detect Duplicates Using</strong><br/>
+                        The match logic to use when determining duplicates.<br/>By default, both the URL and page title together will be used.
+                    </li>
+                </ul>
+            </div>
+    
+            <table style="margin-top: 10px; margin-bottom: 10px;">
+                <thead>
+                    <thead>
+                        <th style="width:300px" title="Enter a pattern to match specific websites (URLs)">URL Pattern</th>
+                        <th style="width:100px" title="If checked, the full URL (including query params) will be considered when matching">Use&nbsp;Full&nbsp;URL</th>
+                        <th style="width:150px" title="Choose how duplicates are detected">Detect Duplicates Using</th>
+                        <th style="width:50px">&nbsp;</th>
+                    </thead>
+                    <tbody id="rule-list"></tbody>
+                </thead>
+            </table>
+        </div>
+        <div class="button-container">
+            <div id="version" class="version">vX.X</div>
+            <button id="btn-save" class="btn blue" style="width:80px; height:30px">Save</button>
+            <button id="btn-close" class="btn grey" style="width:80px; height:30px">Cancel</button>
+        </div>
+    </div>
+</body>
+</html>

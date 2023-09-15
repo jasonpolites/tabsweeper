@@ -3,9 +3,9 @@
   "name": "Tab Sweeper",
   "short_name": "Tab Sweeper",
   "description": "When clicked, closes duplicate tabs",
-  "version": "1.30",
+  "version": "1.0.0",
   "options_ui": {
-    "page": "settings.html",
+    "page": "options_new.html",
     "open_in_tab": false
   },
   "action": {
@@ -28,7 +28,6 @@
   "permissions": [
     "activeTab",
     "tabs",
-    "contextMenus",
     "storage"
   ],
   "web_accessible_resources": [

@@ -5,7 +5,7 @@
   "description": "When clicked, closes duplicate tabs",
   "version": "0.0.1",
   "options_ui": {
-    "page": "options_new.html",
+    "page": "options.html",
     "open_in_tab": false
   },
   "action": {

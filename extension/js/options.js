@@ -160,33 +160,43 @@ const updateVersion = () => {
   document.getElementById(`version`).innerHTML = `v${version}`;
 }
 
-const loadRules = () => {
-  chrome.storage.sync.get('rules', (result) => {
-    let rules = result.rules || {};
-    document.getElementById('helpToggle').addEventListener('click', toggleHelp);
-    document.getElementById('btn-close').addEventListener('click', doClose);
-    document.getElementById('btn-save').addEventListener('click', () => {
-      saveAndClose(rules);
-    });
+const loadRules = async () => {
 
-    renderRules(rules);
+  let result = await chrome.storage.sync.get('rules');
+
+  // chrome.storage.sync.get('rules', (result) => {
+  let rules = result.rules || {};
+  document.getElementById('helpToggle').addEventListener('click', toggleHelp);
+  document.getElementById('btn-close').addEventListener('click', doClose);
+  document.getElementById('btn-save').addEventListener('click', async () => {
+    await saveAndClose(rules);
   });
+
+  renderRules(rules);
+  // });
 }
 
-const saveAndClose = (rules) => {
+const saveAndClose = async (rules) => {
   if(addRule(rules) === true) {
     renderRules(rules);
   }
-  chrome.storage.sync.set({'rules': rules}, () => {
-    chrome.runtime.sendMessage(null, {
-        action: 'update_exclusions'
-    }, null, () => {
-        doClose();
-    });
+
+  await chrome.storage.sync.set({'rules': rules});
+  await chrome.runtime.sendMessage(null, {
+    action: 'update_exclusions'
   });
+  doClose();
+
+  // chrome.storage.sync.set({'rules': rules}, () => {
+    // chrome.runtime.sendMessage(null, {
+    //     action: 'update_exclusions'
+    // }, null, () => {
+    //     doClose();
+    // });
+  // });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   updateVersion();
-  loadRules();
+  await loadRules();
 });

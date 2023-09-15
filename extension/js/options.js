@@ -105,7 +105,9 @@ const insertRuleEntry = (rules, rule) => {
     elemButton.innerHTML = 'Add';
     elemButton.setAttribute('class', 'btn-small add');
     elemButton.addEventListener('click', () => {
-      addRule(rules)
+      if(addRule(rules) === true) {
+        renderRules(rules);
+      }
     });
   }
 }
@@ -123,8 +125,9 @@ const addRule = (rules) => {
 
   if(rule.strUrlPattern.trim().length > 0) {
     rules[rule.strUrlPattern] = rule;
-    renderRules(rules);
+    return true;
   }
+  return false;
 }
 
 const removeRule = (rules, key) => {
@@ -163,14 +166,17 @@ const loadRules = () => {
     document.getElementById('helpToggle').addEventListener('click', toggleHelp);
     document.getElementById('btn-close').addEventListener('click', doClose);
     document.getElementById('btn-save').addEventListener('click', () => {
-      saveRules(rules);
+      saveAndClose(rules);
     });
 
     renderRules(rules);
   });
 }
 
-const saveRules = (rules) => {
+const saveAndClose = (rules) => {
+  if(addRule(rules) === true) {
+    renderRules(rules);
+  }
   chrome.storage.sync.set({'rules': rules}, () => {
     chrome.runtime.sendMessage(null, {
         action: 'update_exclusions'

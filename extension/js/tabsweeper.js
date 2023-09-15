@@ -105,11 +105,6 @@ const setBadgeText = (val) => {
       "title": "Close Duplicate Tabs"
     });
   }
-
-  chrome.action.setBadgeBackgroundColor(
-    {color: '#32CD32'},  // LimeGreen
-    () => {}
-  );
 }
 
 const getTabIdentifier = (tab, type, bFullUrl) => {
@@ -194,6 +189,11 @@ const main = async () => {
     }
     return true;
   });
+
+  chrome.action.setBadgeBackgroundColor(
+    {color: '#32CD32'}, // LimeGreen
+    () => {}
+  );  
 
   await loadOptionsSync();
   await setBadgeValue();

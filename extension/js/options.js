@@ -155,7 +155,7 @@ const updateVersion = () => {
 
 const loadRules = async () => {
 
-  let result = await chrome.storage.sync.get('rules');
+  let result = await chrome.storage.sync.get(null);
   let rules = result.rules || {};
   
   document.getElementById('helpToggle').addEventListener('click', toggleHelp);
@@ -175,7 +175,7 @@ const getRulesFromFormData = () => {
     const rule = makeRuleFromFormRow(elemRow);
     if(rule.strUrlPattern.trim().length > 0) {
       rules[rule.strUrlPattern] = rule;
-    }      
+    }
   }
   return rules;
 }
@@ -191,7 +191,9 @@ const makeRuleFromFormRow = (elemRow) => {
 
 const saveAndClose = async (rules) => {
   rules = getRulesFromFormData();
-  await chrome.storage.sync.set({'rules': rules});
+  let data = await chrome.storage.sync.get(null);
+  data.rules = rules;
+  await chrome.storage.sync.set(data);
   await chrome.runtime.sendMessage(null, {
     action: 'update_exclusions'
   });

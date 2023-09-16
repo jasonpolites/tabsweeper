@@ -15,7 +15,6 @@ const TYPE_URL = 0;
 const TYPE_TITLE = 1;
 const TYPE_DEFAULT = 2;
 
-
 /**
  * Closes any duplicate tabs
  * @returns The duplicate tabs that were closed
@@ -133,20 +132,69 @@ const getTabIdentifier = (tab, type, bFullUrl) => {
 }
 
 /**
- * Loads the options set by the user
- * @returns The loaded options map containing the custom rules for url patterns.
+ * Loads the rules set by the user
+ * @returns The loaded rules map containing the custom rules for url patterns.
  */
 const loadOptionsSync = async () => {
-  let result = await chrome.storage.sync.get('rules');
-  if (result) {
-    rules = result.rules;
-  } else {
+  let ruleData = await chrome.storage.sync.get('rules');
+  if (!ruleData || !ruleData.rules) {
     rules = {};
+  } else {
+    rules = ruleData.rules;
   }
   return rules;
 }
 
+/*****************************************************************************
+ * PATCHES
+ *****************************************************************************/
+
+/**
+ * Patches v0.0.3 to update the clear the stored data structure
+ * @param The index of this patch, set when called by runPatches
+ */
+const patch_0_0_3 = async () => {
+  await chrome.storage.sync.clear();
+}
+
+/**
+ * Add patch functions here.
+ * The patch index will be stored in the extension data set
+ */
+const PATCHES = [
+  patch_0_0_3
+];
+
+/**
+ * Runs any pending updates based on the version of the extension per the manifest.
+ */
+const runPatches = async () => {
+
+  let data = await chrome.storage.sync.get(null);
+  let index = data.patchIndex || 0;
+  let i, count = 0;
+
+  for (i = index; i < PATCHES.length; i++) {
+    console.log(`Running patch ${i}`);
+    await PATCHES[i].call(this, i);
+    count++;
+  }
+
+  if(count > 0) {
+    console.log(`Updating patch index to ${i}`);
+    data.patchIndex = i;
+    await chrome.storage.sync.set(data);
+  }
+}
+
+
+/*****************************************************************************
+ * END PATCHES
+ *****************************************************************************/
+
 const main = async () => {
+
+  await runPatches();
 
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, _tab) => {
     if (changeInfo.status === 'complete') {

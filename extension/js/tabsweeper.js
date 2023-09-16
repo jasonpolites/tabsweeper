@@ -181,6 +181,8 @@ const runPatches = async () => {
   }
 
   if(count > 0) {
+    // Reload the data
+    data = await chrome.storage.sync.get(null);
     console.log(`Updating patch index to ${i}`);
     data.patchIndex = i;
     await chrome.storage.sync.set(data);

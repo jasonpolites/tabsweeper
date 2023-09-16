@@ -136,9 +136,11 @@ const getTabIdentifier = (tab, type, bFullUrl) => {
  * @returns The loaded rules map containing the custom rules for url patterns.
  */
 const loadOptionsSync = async () => {
-  rules = await chrome.storage.sync.get('rules');
-  if (!rules) {
+  let ruleData = await chrome.storage.sync.get('rules');
+  if (!ruleData || !ruleData.rules) {
     rules = {};
+  } else {
+    rules = ruleData.rules;
   }
   return rules;
 }

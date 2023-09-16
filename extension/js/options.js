@@ -156,9 +156,6 @@ const updateVersion = () => {
 const loadRules = async () => {
 
   let result = await chrome.storage.sync.get(null);
-
-  console.log(result);
-
   let rules = result.rules || {};
   
   document.getElementById('helpToggle').addEventListener('click', toggleHelp);

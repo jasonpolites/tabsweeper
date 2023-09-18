@@ -148,23 +148,9 @@ const clearRules = () => {
   }
 }
 
-const updateVersion = () => {
+const updateVersion = (patchIndex) => {
   let version = chrome.runtime.getManifest().version;
-  document.getElementById(`version`).innerHTML = `v${version}`;
-}
-
-const loadRules = async () => {
-
-  let result = await chrome.storage.sync.get(null);
-  let rules = result.rules || {};
-  
-  document.getElementById('helpToggle').addEventListener('click', toggleHelp);
-  document.getElementById('btn-close').addEventListener('click', doClose);
-  document.getElementById('btn-save').addEventListener('click', async () => {
-    await saveAndClose();
-  });
-
-  renderRules(rules);
+  document.getElementById(`version`).innerHTML = `v${version}, patch: ${patchIndex}`;
 }
 
 const getRulesFromFormData = () => {
@@ -186,21 +172,46 @@ const makeRuleFromFormRow = (elemRow) => {
     strUrlPattern: elemRow.childNodes.item(0).firstChild.value,
     bUseFullUrl: elemRow.childNodes.item(1).firstChild.checked,
     detectType: parseInt(detectSelect.options[detectSelect.selectedIndex].value)
-  };  
+  };
+}
+
+const loadData = async () => {
+
+  let result = await chrome.storage.sync.get(null);
+  let rules = result.rules || {};
+  
+  document.getElementById('helpToggle').addEventListener('click', toggleHelp);
+  document.getElementById('btn-close').addEventListener('click', doClose);
+  document.getElementById('btn-save').addEventListener('click', async () => {
+    await saveAndClose();
+  });
+
+  renderRules(rules);
+  document.getElementById(`chkDisplayWarning`).checked = (result.bShowWarning === true);
+
+  return result;
 }
 
 const saveAndClose = async (rules) => {
   rules = getRulesFromFormData();
   let data = await chrome.storage.sync.get(null);
+
+  if(!data) {
+    data = {};
+  }
+
   data.rules = rules;
+  data.bShowWarning = document.getElementById(`chkDisplayWarning`).checked;
+
   await chrome.storage.sync.set(data);
+  
   await chrome.runtime.sendMessage(null, {
-    action: 'update_exclusions'
+    action: 'update_options'
   });
   doClose();
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  updateVersion();
-  await loadRules();
+  let data = await loadData();
+  updateVersion(data.patchIndex);
 });

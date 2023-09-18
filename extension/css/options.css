@@ -139,6 +139,7 @@ th {
   background-color:var(--sub);
   padding:6px;
   border-bottom: solid 4px var(--sub-hi);
+  border-left: solid 1px var(--sub-hi);
 }
 
 .btn {
@@ -197,6 +198,7 @@ button.btn-small {
   position: absolute;
   bottom: 0;
   left: 0;
-  font-size: 9px;
+  font-size: 10px;
   color: var(--grey);
+  font-weight: bold;
 }

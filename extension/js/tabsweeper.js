@@ -6,10 +6,10 @@
  */
 let pendingCloseEvents = 0;
 
-/**
- * The custom rules defined in the options. This is a basic (serializable) map/object
- */
-let rules;
+const options = {
+  rules: undefined,
+  bShowWarning: false
+};
 
 const TYPE_URL = 0;
 const TYPE_TITLE = 1;
@@ -24,15 +24,26 @@ const closeDuplicateTabsSync = async () => {
   let num = dupes?.length;
   pendingCloseEvents = num;
   if (num > 0) {
-    for (let i = 0; i < dupes.length; i++) {
-      await chrome.tabs.remove(dupes[i].id);
-      if (--num === 0) {
-        setBadgeValue(0);
-      } 
+    if(options.bShowWarning === true) {
+      // Render the list of dupes in a popup
+      console.log(dupes);
+    } else {
+      await closeTabsSync(dupes);
     }
   } 
   return dupes;
 }
+
+const closeTabsSync = async (tabs) => {
+  let num = tabs?.length;
+  for (let i = 0; i < tabs?.length; i++) {
+    await chrome.tabs.remove(tabs[i].id);
+    if (--num === 0) {
+      await setBadgeValue(0);
+    } 
+  }
+}
+
 
 /**
  * Finds any duplicate tabs
@@ -41,16 +52,17 @@ const closeDuplicateTabsSync = async () => {
 const getDuplicateTabsSync = async () => {
   let tabs = await chrome.tabs.query({});
   let dupes = [];
+  let dupe;
 
   if (tabs) {
     let all = [];
     for (let i = 0; i < tabs.length; i++) {
       let type = TYPE_DEFAULT;
       let bFullUrl = false;
-      for (let rule in rules) {
+      for (let rule in options.rules) {
         if (tabs[i].url.match(rule) != null) {
-          type = parseInt(rules[rule].detectType);
-          bFullUrl = rules[rule].bUseFullUrl === true;
+          type = parseInt(options.rules[rule].detectType);
+          bFullUrl = options.rules[rule].bUseFullUrl === true;
           break;
         }
       }
@@ -61,10 +73,13 @@ const getDuplicateTabsSync = async () => {
         } else {
           // Don't push this one if it's the current tab
           if(tabs[i].highlighted == true) {
-            dupes.push(all[id]);
+            dupe = all[id];
           } else {
-            dupes.push(tabs[i]);
+            dupe = tabs[i];
           }
+
+          console.log(`${dupe.title} is a duplicate`);
+          dupes.push(dupe);
         }
       }
     }
@@ -77,9 +92,13 @@ const getDuplicateTabsSync = async () => {
 const setBadgeValue = async (val) => {
   if (val == undefined) {
     let dupes = await getDuplicateTabsSync();
+
     setBadgeText(dupes.length);
     let title;
     if (dupes.length > 0) {
+
+      console.log(`Found ${dupes.length} dupes`)
+
       title = "Click to close these tabs:\n";
       for (let i = 0; i < dupes.length; i++) {
         title += "- " + dupes[i].title + "\n";
@@ -127,7 +146,7 @@ const getTabIdentifier = (tab, type, bFullUrl) => {
   if (type === TYPE_URL) {
     return url;
   } else {
-    return url + "#" + tab.title;
+    return url + "#" + tab .title;
   }
 }
 
@@ -136,13 +155,14 @@ const getTabIdentifier = (tab, type, bFullUrl) => {
  * @returns The loaded rules map containing the custom rules for url patterns.
  */
 const loadOptionsSync = async () => {
-  let ruleData = await chrome.storage.sync.get('rules');
-  if (!ruleData || !ruleData.rules) {
-    rules = {};
+  let optionsData = await chrome.storage.sync.get();
+  if (optionsData) {
+    options.rules = optionsData.rules || {};
+    options.bShowWarning = (optionsData.bShowWarning === true);
   } else {
-    rules = ruleData.rules;
+    options.rules = {};
   }
-  return rules;
+  return options;
 }
 
 /*****************************************************************************
@@ -228,14 +248,12 @@ const main = async () => {
   // Add a listener to respond to changes in settings as these changes may
   // affect how many duplicates we think we have
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    if (message.action) {
-      if (message.action === 'update_exclusions') {
-        (async () => {
-          await loadOptionsSync();
-          await setBadgeValue();
-          sendResponse();
-        })();
-      }
+    if (message.action === 'update_options') {
+      (async () => {
+        await loadOptionsSync();
+        await setBadgeValue();
+        sendResponse();
+      })();
     }
     return true;
   });

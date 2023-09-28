@@ -43,7 +43,7 @@ const closeDuplicateTabsSync = async () => {
 
 const closeTabsSync = async (tabs) => {
   let num = tabs?.length;
-  for (let i = 0; i < tabs.length; i++) {
+  for (let i = 0; i < tabs?.length; i++) {
     await chrome.tabs.remove(tabs[i].id);
     if (--num === 0) {
       await setBadgeValue(0);
@@ -59,6 +59,7 @@ const closeTabsSync = async (tabs) => {
 const getDuplicateTabsSync = async () => {
   let tabs = await chrome.tabs.query({});
   let dupes = [];
+  let dupe;
 
   if (tabs) {
     let all = [];
@@ -79,10 +80,13 @@ const getDuplicateTabsSync = async () => {
         } else {
           // Don't push this one if it's the current tab
           if(tabs[i].highlighted == true) {
-            dupes.push(all[id]);
+            dupe = all[id];
           } else {
-            dupes.push(tabs[i]);
+            dupe = tabs[i];
           }
+
+          console.log(`${dupe.title} is a duplicate`);
+          dupes.push(dupe);
         }
       }
     }
@@ -95,9 +99,13 @@ const getDuplicateTabsSync = async () => {
 const setBadgeValue = async (val) => {
   if (val == undefined) {
     let dupes = await getDuplicateTabsSync();
+
     setBadgeText(dupes.length);
     let title;
     if (dupes.length > 0) {
+
+      console.log(`Found ${dupes.length} dupes`)
+
       title = "Click to close these tabs:\n";
       for (let i = 0; i < dupes.length; i++) {
         title += "- " + dupes[i].title + "\n";

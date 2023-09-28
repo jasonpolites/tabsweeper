@@ -77,8 +77,6 @@ const getDuplicateTabsSync = async () => {
           } else {
             dupe = tabs[i];
           }
-
-          console.log(`${dupe.title} is a duplicate`);
           dupes.push(dupe);
         }
       }
@@ -96,9 +94,6 @@ const setBadgeValue = async (val) => {
     setBadgeText(dupes.length);
     let title;
     if (dupes.length > 0) {
-
-      console.log(`Found ${dupes.length} dupes`)
-
       title = "Click to close these tabs:\n";
       for (let i = 0; i < dupes.length; i++) {
         title += "- " + dupes[i].title + "\n";

@@ -151,6 +151,8 @@ const clearRules = () => {
 const updateVersion = (patchIndex) => {
   let version = chrome.runtime.getManifest().version;
   document.getElementById(`version`).innerHTML = `v${version}, patch: ${patchIndex}`;
+  document.getElementById(`bug-link`).setAttribute("href", `https://github.com/jasonpolites/tabsweeper/issues/new?body=%0A%0A%0A>+[!NOTE]%0A>+Issue+found+in+v${version},+patch:+${patchIndex}`);
+
 }
 
 const getRulesFromFormData = () => {

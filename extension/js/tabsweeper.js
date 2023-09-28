@@ -6,17 +6,10 @@
  */
 let pendingCloseEvents = 0;
 
-
 const options = {
   rules: undefined,
   bShowWarning: false
 };
-
-/**
- * The custom rules defined in the options. This is a basic (serializable) map/object
- * @deprecated
- */
-let rules;
 
 const TYPE_URL = 0;
 const TYPE_TITLE = 1;

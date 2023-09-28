@@ -3,7 +3,7 @@
   "name": "Tab Sweeper",
   "short_name": "Tab Sweeper",
   "description": "When clicked, closes duplicate tabs",
-  "version": "0.0.6",
+  "version": "0.0.5",
   "options_ui": {
     "page": "options.html",
     "open_in_tab": false

@@ -189,7 +189,7 @@ const loadData = async () => {
   });
 
   renderRules(rules);
-  document.getElementById(`chkDisplayWarning`).checked = (result.bShowWarning === true);
+  // document.getElementById(`chkDisplayWarning`).checked = (result.bShowWarning === true);
 
   return result;
 }
@@ -203,7 +203,7 @@ const saveAndClose = async (rules) => {
   }
 
   data.rules = rules;
-  data.bShowWarning = document.getElementById(`chkDisplayWarning`).checked;
+  // data.bShowWarning = document.getElementById(`chkDisplayWarning`).checked;
 
   await chrome.storage.sync.set(data);
   

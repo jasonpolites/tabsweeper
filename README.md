@@ -1,5 +1,4 @@
 # TabSweeper
-(CONFIDENTIAL)
 
 You need to side load the extension.
 

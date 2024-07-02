@@ -88,11 +88,14 @@ const getDuplicateTabsSync = async () => {
 }
 
 const setBadgeValue = async (val) => {
-  if (val == undefined) {
+  if (val == undefined || val == null) {
+
     let dupes = await getDuplicateTabsSync();
 
     setBadgeText(dupes.length);
+
     let title;
+
     if (dupes.length > 0) {
       title = "Click to close these tabs:\n";
       for (let i = 0; i < dupes.length; i++) {
@@ -213,19 +216,15 @@ const main = async () => {
 
   await runPatches();
 
-  chrome.tabs.onUpdated.addListener((tabId, changeInfo, _tab) => {
+  chrome.tabs.onUpdated.addListener(async (_tabId, changeInfo, _tab) => {
     if (changeInfo.status === 'complete') {
-      (async () => {
-        await setBadgeValue();
-      })();
+      await setBadgeValue();
     }
   });
 
-  chrome.tabs.onRemoved.addListener((tabId, _changeInfo, _tab) => {
+  chrome.tabs.onRemoved.addListener(async (_tabId, _changeInfo, _tab) => {
     if (pendingCloseEvents === 0) {
-      (async () => {
-        await setBadgeValue();
-      })();
+      await setBadgeValue();
     } else {
       pendingCloseEvents--;
       if (pendingCloseEvents < 0) {
@@ -234,21 +233,17 @@ const main = async () => {
     }
   });
 
-  chrome.action.onClicked.addListener(() => {
-    (async () => {
-      await closeDuplicateTabsSync();
-    })();
+  chrome.action.onClicked.addListener(async () => {
+    await closeDuplicateTabsSync();
   });
 
   // Add a listener to respond to changes in settings as these changes may
   // affect how many duplicates we think we have
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener(async (message, _sender, sendResponse) => {
     if (message.action === 'update_options') {
-      (async () => {
-        await loadOptionsSync();
-        await setBadgeValue();
-        sendResponse();
-      })();
+      await loadOptionsSync();
+      await setBadgeValue();
+      sendResponse();
     }
     return true;
   });
@@ -265,5 +260,3 @@ const main = async () => {
 (async () => {
   await main();
 })();
-
-

@@ -12,6 +12,9 @@ You need to side load the extension.
 
 ## Release Notes
 
+ - v0.0.6
+   - Removed redundant async closures
+
  - v0.0.5
    - Added bug report link
 

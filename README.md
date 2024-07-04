@@ -1,4 +1,11 @@
+
+<img src="dev/title.png" width="600">
+
 # TabSweeper
+
+TabSweeper sweeps duplicate tabs in Google Chrome
+
+## Installation Instructions
 
 You need to side load the extension.
 

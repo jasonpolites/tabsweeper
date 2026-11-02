@@ -14,6 +14,8 @@ const options = {
 const TYPE_URL = 0;
 const TYPE_TITLE = 1;
 const TYPE_DEFAULT = 2;
+const TYPE_ALWAYS_CLOSE = 3;
+const TYPE_HOST = 4;
 
 /**
  * Closes any duplicate tabs
@@ -66,7 +68,10 @@ const getDuplicateTabsSync = async () => {
           break;
         }
       }
-      if (type >= 0) {
+      if (type === TYPE_ALWAYS_CLOSE) {
+        // Matching tabs are always closed, even if there's only one
+        dupes.push(tabs[i]);
+      } else if (type >= 0) {
         let id = getTabIdentifier(tabs[i], type, bFullUrl);
         if (!all[id]) {
           all[id] = tabs[i];
@@ -130,6 +135,14 @@ const getTabIdentifier = (tab, type, bFullUrl) => {
   }
 
   let url = tab.url;
+
+  if (type === TYPE_HOST) {
+    try {
+      return new URL(url).host;
+    } catch {
+      return url;
+    }
+  }
 
   if (bFullUrl !== true) {
     if (url && url.indexOf('#') >= 0) {
@@ -212,51 +225,66 @@ const runPatches = async () => {
  * END PATCHES
  *****************************************************************************/
 
-const main = async () => {
+const init = async () => {
 
   await runPatches();
-
-  chrome.tabs.onUpdated.addListener(async (_tabId, changeInfo, _tab) => {
-    if (changeInfo.status === 'complete') {
-      await setBadgeValue();
-    }
-  });
-
-  chrome.tabs.onRemoved.addListener(async (_tabId, _changeInfo, _tab) => {
-    if (pendingCloseEvents === 0) {
-      await setBadgeValue();
-    } else {
-      pendingCloseEvents--;
-      if (pendingCloseEvents < 0) {
-        pendingCloseEvents = 0;
-      }
-    }
-  });
-
-  chrome.action.onClicked.addListener(async () => {
-    await closeDuplicateTabsSync();
-  });
-
-  // Add a listener to respond to changes in settings as these changes may
-  // affect how many duplicates we think we have
-  chrome.runtime.onMessage.addListener(async (message, _sender, sendResponse) => {
-    if (message.action === 'update_options') {
-      await loadOptionsSync();
-      await setBadgeValue();
-      sendResponse();
-    }
-    return true;
-  });
 
   chrome.action.setBadgeBackgroundColor(
     {color: '#32CD32'}, // LimeGreen
     () => {}
-  );  
+  );
 
   await loadOptionsSync();
   await setBadgeValue();
 }
 
-(async () => {
-  await main();
-})();
+/**
+ * Resolves once patches have run and options are loaded. Handlers await this
+ * so they never run against unloaded options.
+ */
+const ready = init();
+
+/*
+ * Listeners MUST be registered synchronously at the top level. The service
+ * worker is shut down when idle, and Chrome dispatches the waking event
+ * (e.g. an icon click) right after the script's first synchronous pass.
+ * Listeners registered after an await miss that event.
+ */
+chrome.tabs.onUpdated.addListener(async (_tabId, changeInfo, _tab) => {
+  if (changeInfo.status === 'complete') {
+    await ready;
+    await setBadgeValue();
+  }
+});
+
+chrome.tabs.onRemoved.addListener(async (_tabId, _changeInfo, _tab) => {
+  await ready;
+  if (pendingCloseEvents === 0) {
+    await setBadgeValue();
+  } else {
+    pendingCloseEvents--;
+    if (pendingCloseEvents < 0) {
+      pendingCloseEvents = 0;
+    }
+  }
+});
+
+chrome.action.onClicked.addListener(async () => {
+  await ready;
+  await closeDuplicateTabsSync();
+});
+
+// Add a listener to respond to changes in settings as these changes may
+// affect how many duplicates we think we have.
+// Not async: the listener must return true (not a Promise) to keep the
+// message channel open until sendResponse is called.
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.action === 'update_options') {
+    ready
+      .then(loadOptionsSync)
+      .then(() => setBadgeValue())
+      .then(() => sendResponse());
+    return true;
+  }
+  return false;
+});

@@ -5,6 +5,8 @@ const TYPE_NONE = -1;
 const TYPE_URL = 0;
 const TYPE_TITLE = 1;
 const TYPE_DEFAULT = 2;
+const TYPE_ALWAYS_CLOSE = 3;
+const TYPE_HOST = 4;
 
 const toggleHelp = () => {
   let x = document.getElementById('helptext');
@@ -36,7 +38,9 @@ const insertRuleEntry = (rules, rule) => {
   const elemDetectionInput = document.createElement('SELECT');
   const elemOptionDefault = document.createElement('OPTION');
   const elemOptionURL = document.createElement('OPTION');
+  const elemOptionHost = document.createElement('OPTION');
   const elemOptionTitle = document.createElement('OPTION');
+  const elemOptionAlways = document.createElement('OPTION');
   const elemOptionNone = document.createElement('OPTION');
 
   elemOptionDefault.value = TYPE_DEFAULT;
@@ -45,15 +49,23 @@ const insertRuleEntry = (rules, rule) => {
   elemOptionURL.value = TYPE_URL;
   elemOptionURL.text = `URL only`;
 
+  elemOptionHost.value = TYPE_HOST;
+  elemOptionHost.text = `Host only`;
+
   elemOptionTitle.value = TYPE_TITLE;
   elemOptionTitle.text = `Title only`;
+
+  elemOptionAlways.value = TYPE_ALWAYS_CLOSE;
+  elemOptionAlways.text = `Always close`;
 
   elemOptionNone.value = TYPE_NONE;
   elemOptionNone.text = `None (do not dedupe)`;
 
   elemDetectionInput.appendChild(elemOptionDefault);
   elemDetectionInput.appendChild(elemOptionURL);
+  elemDetectionInput.appendChild(elemOptionHost);
   elemDetectionInput.appendChild(elemOptionTitle);
+  elemDetectionInput.appendChild(elemOptionAlways);
   elemDetectionInput.appendChild(elemOptionNone);
 
   const elemButton = document.createElement('BUTTON');
@@ -93,11 +105,17 @@ const insertRuleEntry = (rules, rule) => {
       case TYPE_URL:
         elemDetectionInput.selectedIndex = 1;
       break;
-      case TYPE_TITLE:
+      case TYPE_HOST:
         elemDetectionInput.selectedIndex = 2;
       break;
-      case TYPE_NONE:
+      case TYPE_TITLE:
         elemDetectionInput.selectedIndex = 3;
+      break;
+      case TYPE_ALWAYS_CLOSE:
+        elemDetectionInput.selectedIndex = 4;
+      break;
+      case TYPE_NONE:
+        elemDetectionInput.selectedIndex = 5;
       break;
     }
   } else {

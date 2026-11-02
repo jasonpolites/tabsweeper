@@ -19,6 +19,12 @@ You need to side load the extension.
 
 ## Release Notes
 
+ - v0.0.7
+   - Fixed icon clicks sometimes being ignored when the extension had been idle
+   - Fixed saving options sometimes failing to close the options dialog
+   - Added "Host only" detection option to treat all tabs on the same host as duplicates
+   - Added "Always close" detection option to close every tab matching a pattern, even if it isn't a duplicate
+
  - v0.0.6
    - Removed redundant async closures
 
